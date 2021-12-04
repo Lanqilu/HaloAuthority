@@ -35,7 +35,7 @@
                 <!--当前环境-->
                 <pom.profile.name>dev</pom.profile.name>
                 <!--Nacos 配置中心地址-->
-                <pom.nacos.ip>127.0.0.1</pom.nacos.ip>
+                <pom.nacos.ip>localhost</pom.nacos.ip>
                 <pom.nacos.port>8848</pom.nacos.port>
                 <!--Nacos 配置中心命名空间,用于支持多环境.这里必须使用 ID，不能使用名称,默认为空-->
                 <pom.nacos.namespace>fbcd5546-cf3a-47f2-8916-23473cca212e</pom.nacos.namespace>
