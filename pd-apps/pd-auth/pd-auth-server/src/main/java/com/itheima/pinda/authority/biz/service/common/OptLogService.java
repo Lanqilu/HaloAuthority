@@ -1,13 +1,10 @@
 package com.itheima.pinda.authority.biz.service.common;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.itheima.pinda.authority.entity.common.OptLog;
 import com.itheima.pinda.log.entity.OptLogDTO;
-
 /**
- * @author Halo
- * @create 2021/12/04 下午 04:48
- * @description
+ * 业务接口
+ * 操作日志
  */
 public interface OptLogService extends IService<OptLog> {
     /**
