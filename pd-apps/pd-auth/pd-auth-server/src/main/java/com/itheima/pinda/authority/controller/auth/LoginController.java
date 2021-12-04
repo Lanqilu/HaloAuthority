@@ -7,7 +7,6 @@ import com.itheima.pinda.authority.dto.auth.LoginParamDTO;
 import com.itheima.pinda.base.BaseController;
 import com.itheima.pinda.base.R;
 import com.itheima.pinda.exception.BizException;
-import com.itheima.pinda.log.annotation.SysLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ public class LoginController extends BaseController {
     @Autowired
     private AuthManager authManager; // 认证管理器对象
 
-    @SysLog("生成验证码")
     @ApiOperation(value = "验证码", notes = "验证码")
     @GetMapping(value = "/captcha", produces = "image/png")
     public void captcha(@RequestParam(value = "key") String key,
@@ -45,7 +43,6 @@ public class LoginController extends BaseController {
     /**
      * 登录认证
      */
-    @SysLog("登录")
     @ApiOperation(value = "登录", notes = "登录")
     @PostMapping(value = "/login")
     public R<LoginDTO> login(@Validated @RequestBody LoginParamDTO login)
