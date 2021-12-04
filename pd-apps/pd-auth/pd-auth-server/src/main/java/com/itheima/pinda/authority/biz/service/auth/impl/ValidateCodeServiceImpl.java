@@ -43,4 +43,25 @@ public class ValidateCodeServiceImpl implements ValidateCodeService {
         cache.set(CacheKey.CAPTCHA, key, StringUtils.lowerCase(captcha.text()));
         captcha.out(response.getOutputStream());
     }
+
+    // 校验验证码
+    @Override
+    public boolean check(String key, String code) {
+        if (StringUtils.isBlank(code)) {
+            throw BizException.validFail("请输入验证码");
+        }
+        // 根据 key 从缓存中获取验证码
+        CacheObject cacheObject = cache.get(CacheKey.CAPTCHA, key);
+        if (cacheObject.getValue() == null) {
+            throw BizException.validFail("验证码已过期");
+        }
+        // 比对验证码
+        if (!StringUtils.equalsIgnoreCase(code,
+                String.valueOf(cacheObject.getValue()))) {
+            throw BizException.validFail("验证码不正确");
+        }
+        // 验证通过，立即从缓存中删除验证码
+        cache.evict(CacheKey.CAPTCHA, key);
+        return true;
+    }
 }
