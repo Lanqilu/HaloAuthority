@@ -40,16 +40,16 @@ public class LoginController extends BaseController {
         validateCodeService.create(key, response);
     }
 
-    /**
-     * 登录认证
-     */
+    //登录认证
+    @PostMapping("/login")
+    @ApiOperation(notes = "登录",value = "登录")
     @SysLog("登录")
-    public R<LoginDTO> login(@Validated @RequestBody LoginParamDTO loginParamDTO) {
+    public R<LoginDTO> login(@Validated @RequestBody LoginParamDTO loginParamDTO){
         //校验验证码是否正确
         boolean check = validateCodeService.check(loginParamDTO.getKey(), loginParamDTO.getCode());
-        if (check) {
+        if(check){
             //验证码校验通过，执行具体的登录认证逻辑
-            R<LoginDTO> r = authManager.login(loginParamDTO.getAccount(), loginParamDTO.getPassword());
+            R<LoginDTO> r = authManager.login(loginParamDTO.getAccount(),loginParamDTO.getPassword());
             return r;
         }
         //验证码校验不通过，直接返回
