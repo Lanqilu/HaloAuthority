@@ -8,19 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
-/**
- * @author Halo
- * @create 2021/12/05 下午 01:24
- * @description
- */
-@FeignClient(name = "${pinda.feign.authority-server:pd-auth-server}",
-        fallback = ResourceApiFallback.class)
+@FeignClient(name = "${pinda.feign.authority-server:pd-auth-server}")
 public interface ResourceApi {
-    // 获取所有需要鉴权的资源
+    //获取所有需要鉴权的资源
     @GetMapping("/resource/list")
     public R<List> list();
 
-    // 查询当前登录用户拥有的资源权限
+    //查询当前登录用户拥有的资源权限
     @GetMapping("/resource")
     public R<List<Resource>> visible(ResourceQueryDTO resource);
 }

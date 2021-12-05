@@ -9,13 +9,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.core.env.Environment;
+import org.springframework.core.env.ConfigurableEnvironment;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-
+/**
+ * 权限服务启动类
+ */
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableAuthServer
@@ -27,13 +29,15 @@ import java.net.UnknownHostException;
 @EnableLoginArgResolver
 @EnableFormValidator
 public class AuthorityApplication {
-    public static void main(String[] args) throws UnknownHostException {
-        ConfigurableApplicationContext application =
-                SpringApplication.run(AuthorityApplication.class, args);
-        Environment env = application.getEnvironment();
-        log.info("应用 '{}' 运行成功!  Swagger文档: http://{}:{}/doc.html",
-                env.getProperty("spring.application.name"),
-                InetAddress.getLocalHost().getHostAddress(),
-                env.getProperty("server.port"));
+    public static void main(String[] args) throws UnknownHostException{
+        ConfigurableApplicationContext context = SpringApplication.run(AuthorityApplication.class, args);
+        ConfigurableEnvironment environment = context.getEnvironment();
+        String appName = environment.getProperty("spring.application.name");
+        String port = environment.getProperty("server.port");
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+
+        //启动完成后在控制台提示项目启动成功，并且输出当前服务对应的swagger接口文档访问地址
+        //http://localhost:8080/doc.html
+        log.info("应用{}启动成功!swagger地址：http://{}:{}/doc.html",appName,hostAddress,port);
     }
 }

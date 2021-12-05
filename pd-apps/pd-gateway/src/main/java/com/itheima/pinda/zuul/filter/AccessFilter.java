@@ -21,11 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 /**
- * @author Halo
- * @create 2021/12/05 下午 02:05
- * @description 权限验证(鉴权)过滤器
+ * 鉴权处理过滤器
  */
 @Component
 @Slf4j
@@ -54,7 +51,7 @@ public class AccessFilter extends BaseFilter {
     @Override
     public Object run() throws ZuulException {
         //第1步：判断当前请求uri是否需要忽略
-        if (isIgnoreToken()) {
+        if(isIgnoreToken()){
             //当前请求需要忽略，直接放行
             return null;
         }
@@ -63,19 +60,19 @@ public class AccessFilter extends BaseFilter {
         HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
         String method = request.getMethod();//GET POST PUT
         String uri = request.getRequestURI();
-        uri = StrUtil.subSuf(uri, zuulPrefix.length());
-        uri = StrUtil.subSuf(uri, uri.indexOf("/", 1));
+        uri = StrUtil.subSuf(uri,zuulPrefix.length());
+        uri = StrUtil.subSuf(uri,uri.indexOf("/",1));
         String permission = method + uri;//GET/user/page
 
         //第3步：从缓存中获取所有需要进行鉴权的资源(同样是由资源表的method字段值+url字段值拼接成)，如果没有获取到则通过Feign调用权限服务获取并放入缓存中
         CacheObject cacheObject = cacheChannel.get(CacheKey.RESOURCE, CacheKey.RESOURCE_NEED_TO_CHECK);
         List<String> list = (List<String>) cacheObject.getValue();
-        if (list == null) {
+        if(list == null){
             //缓存中没有相应数据
             list = resourceApi.list().getData();
             //放入缓存中
-            if (list != null && list.size() > 0) {
-                cacheChannel.set(CacheKey.RESOURCE, CacheKey.RESOURCE_NEED_TO_CHECK, list);
+            if(list != null && list.size() > 0){
+                cacheChannel.set(CacheKey.RESOURCE,CacheKey.RESOURCE_NEED_TO_CHECK,list);
             }
         }
 
@@ -84,25 +81,25 @@ public class AccessFilter extends BaseFilter {
             return permission.startsWith(resource);
         }).count();
 
-        if (count == 0) {
+        if(count == 0){
             //当前请求是一个未知请求，直接返回未授权异常信息
-            errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(), ExceptionCode.UNAUTHORIZED.getCode(), 200);
+            errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(),ExceptionCode.UNAUTHORIZED.getCode(),200);
             return null;
         }
 
         //第5步：如果包含当前的权限标识符，则从zuul header中取出用户id，根据用户id取出缓存中的用户拥有的权限，如果没有取到则通过Feign调用权限服务获取并放入缓存，判断用户拥有的权限是否包含当前请求的权限标识符
         String userId = RequestContext.getCurrentContext().getZuulRequestHeaders().get(BaseContextConstants.JWT_KEY_USER_ID);
         List<String> visibleResource = (List<String>) cacheChannel.get(CacheKey.USER_RESOURCE, userId).getValue();
-        if (visibleResource == null) {
+        if(visibleResource == null){
             //缓存中不存在，需要通过接口远程调用权限服务来获取
             ResourceQueryDTO resourceQueryDTO = ResourceQueryDTO.builder().userId(new Long(userId)).build();
             List<Resource> resourceList = resourceApi.visible(resourceQueryDTO).getData();
-            if (resourceList != null && resourceList.size() > 0) {
+            if(resourceList != null && resourceList.size() > 0){
                 visibleResource = resourceList.stream().map((resource -> {
                     return resource.getMethod() + resource.getUrl();
                 })).collect(Collectors.toList());
                 //将当前用户拥有的权限载入缓存
-                cacheChannel.set(CacheKey.USER_RESOURCE, userId, visibleResource);
+                cacheChannel.set(CacheKey.USER_RESOURCE,userId,visibleResource);
             }
         }
 
@@ -111,12 +108,12 @@ public class AccessFilter extends BaseFilter {
             return permission.startsWith(resource);
         }).count();
 
-        if (count > 0) {
+        if(count > 0){
             //当前用户拥有访问权限，直接放行
             return null;
-        } else {
+        }else{
             //第7步：如果用户拥有的权限不包含当前请求的权限标识符则说明当前用户没有权限，返回未经授权错误提示
-            errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(), ExceptionCode.UNAUTHORIZED.getCode(), 200);
+            errorResponse(ExceptionCode.UNAUTHORIZED.getMsg(),ExceptionCode.UNAUTHORIZED.getCode(),200);
             return null;
         }
     }

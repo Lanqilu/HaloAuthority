@@ -20,7 +20,6 @@ import org.hibernate.validator.constraints.Length;
  * 实体类
  * 资源
  * </p>
- *
  */
 @Data
 @NoArgsConstructor

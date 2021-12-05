@@ -6,7 +6,6 @@ import com.itheima.pinda.authority.dto.auth.LoginDTO;
 import com.itheima.pinda.authority.dto.auth.LoginParamDTO;
 import com.itheima.pinda.base.BaseController;
 import com.itheima.pinda.base.R;
-import com.itheima.pinda.exception.BizException;
 import com.itheima.pinda.log.annotation.SysLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,38 +32,35 @@ public class LoginController extends BaseController {
     @Autowired
     private AuthManager authManager; // 认证管理器对象
 
-    @SysLog("生成验证码")
-    @ApiOperation(value = "验证码", notes = "验证码")
+    // 为前端系统生成验证码
     @GetMapping(value = "/captcha", produces = "image/png")
-    public void captcha(@RequestParam(value = "key") String key,
-                        HttpServletResponse response) throws IOException {
-        // key 不同用户的标识
-        this.validateCodeService.create(key, response);
+    @ApiOperation(notes = "验证码", value = "验证码")
+    @SysLog("生成验证码")
+    public void captcha(@RequestParam(value = "key") String key, HttpServletResponse response) throws IOException {
+        validateCodeService.create(key, response);
     }
 
     /**
      * 登录认证
      */
     @SysLog("登录")
-    @ApiOperation(value = "登录", notes = "登录")
-    @PostMapping(value = "/login")
-    public R<LoginDTO> login(@Validated @RequestBody LoginParamDTO login)
-            throws BizException {
-        log.info("account={}", login.getAccount());
-        if (this.validateCodeService.check(login.getKey(), login.getCode())) {
-            return this.authManager.login(login.getAccount(), login.getPassword());
+    public R<LoginDTO> login(@Validated @RequestBody LoginParamDTO loginParamDTO) {
+        //校验验证码是否正确
+        boolean check = validateCodeService.check(loginParamDTO.getKey(), loginParamDTO.getCode());
+        if (check) {
+            //验证码校验通过，执行具体的登录认证逻辑
+            R<LoginDTO> r = authManager.login(loginParamDTO.getAccount(), loginParamDTO.getPassword());
+            return r;
         }
+        //验证码校验不通过，直接返回
         return this.success(null);
     }
 
-    //------------------ Test ------------------
-
-    /**
-     * 校验验证码
-     */
-    @PostMapping("/test/check")
+    //校验验证码
+    @PostMapping("/check")
     @ApiOperation(notes = "校验验证码", value = "校验验证码")
     public boolean check(@RequestBody LoginParamDTO loginParamDTO) {
+        //校验验证码是否正确
         return validateCodeService.check(loginParamDTO.getKey(), loginParamDTO.getCode());
     }
 }

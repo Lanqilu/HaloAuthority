@@ -14,8 +14,8 @@ import java.util.function.Consumer;
  * @create 2021/12/04 下午 04:51
  * @description 日志自动配置
  */
-@EnableAsync
 @Configuration
+@EnableAsync
 public class SysLogConfiguration {
     // 日志记录监听器
     @Bean

@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @description
  */
 @SpringBootApplication
-public class ExceptionHandlerApp {
+public class ExceptionHandlerTestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ExceptionHandlerApp.class,args);
+        SpringApplication.run(ExceptionHandlerTestApplication.class,args);
     }
 }
